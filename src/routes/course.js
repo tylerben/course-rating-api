@@ -26,7 +26,7 @@ router.get('/:courseId', authenticateUser, (req, res, next) => {
   Course
     .findById(courseId)
     .populate('reviews')
-    .populate('user')
+    .populate('user', 'fullName')
     .exec((err, courses) => {
       if (err) return next(err);
       res.json(courses);
