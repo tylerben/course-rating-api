@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 const { Schema } = mongoose;
 const ObjectId = Schema.Types.ObjectId;
 
@@ -20,7 +19,6 @@ const ReviewSchema = new Schema({
   },
   review: {
     type: String,
-    required: true,
     trim: true,
   },
 });

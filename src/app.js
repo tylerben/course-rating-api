@@ -33,13 +33,16 @@ db.once('open', () => {
 app.use(setHeaders);
 
 // TODO add additional routes here
+app.use('/api/users', UserRoutes);
+app.use('/api/courses', CourseRoutes);
+app.use('/api/reviews', ReviewRoutes);
 
 // send a friendly greeting for the root route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to the Course Review API'
-  });
-});
+// app.get('/', (req, res) => {
+//   res.json({
+//     message: 'Welcome to the Course Review API'
+//   });
+// });
 
 // uncomment this route in order to test the global error handler
 // app.get('/error', function (req, res) {

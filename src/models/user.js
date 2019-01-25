@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const { Schema } = mongoose;
 
+const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
 const UserSchema = new Schema({
   fullName: {
     type: String,
@@ -13,10 +15,10 @@ const UserSchema = new Schema({
     unique: true,
     required: true,
     trim: true,
-    set: toLower,
+    lowercase: true,
     validate: {
       validator: function(v) {
-          return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(v);
+          return emailRegex.test(v);
       },
       message: props => `${props.value} is not a valid email address`
     },        
@@ -29,24 +31,24 @@ const UserSchema = new Schema({
 
 // authenticate input against database documents
 UserSchema.statics.authenticate = function(emailAddress, password, callback) {
-    User
-        .findOne({ emailAddress })
-        .exec((err, user) => {
-            if (err) {
-                return callback(err);
-            } else if (!user) {
-                const error = new Error('User not found');
-                error.status = 401;
-                return callback(error);
-            }
-            bcrypt.compare(password, user.password, (err, result) => {
-                if (result === true) {
-                    return callback(null, user);
-                } else {
-                    return callback();
-                }
-            });
-        });
+  User
+    .findOne({ emailAddress })
+    .exec((err, user) => {
+      if (err) {
+        return callback(err);
+      } else if (!user) {
+        const error = new Error('User not found');
+        error.status = 401;
+        return callback(error);
+      }
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (result === true) {
+          return callback(null, user);
+        } else {
+          return callback();
+        }
+      });
+    });
 }
 
 UserSchema.pre('save', function(next) {
