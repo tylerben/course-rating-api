@@ -59,6 +59,7 @@ router.put('/:courseId', authenticateUser, (req, res, next) => {
 
 // POST /api/courses/:courseId/reviews 201
 // Creates a review for the specified course ID, sets the Location header to the related course, and returns no content
+// Validation in place to ensure a user cannot review their own course
 router.post('/:courseId/reviews', authenticateUser, (req, res, next) => {
   const { courseId } = req.params;
   const review = new Review(req.body);
@@ -66,13 +67,20 @@ router.post('/:courseId/reviews', authenticateUser, (req, res, next) => {
   review.save((err, review) => {
     if (err) return handleError(err, req, res, next);
     Course
-      .findById(courseId, function (err, course) {
+      .findById(courseId)
+      .populate('user')
+      .exec((err, course) => {
         if (err) return handleError(err, req, res, next);
-        course.reviews.push(review.id);
-        course.save(function (err, updatedCourse) {
-          if (err) return handleError(err, req, res, next);
-          res.redirect(201, `/${courseId}`);
-        });
+        if (course.user.emailAddress === req.user.emailAddress) {
+          const error = new Error('Error: Cannot review own course');
+          return handleError(error, req, res, next);
+        } else {
+          course.reviews.push(review.id);
+          course.save(function (err, updatedCourse) {
+            if (err) return handleError(err, req, res, next);
+            res.redirect(201, `/${courseId}`);
+          });
+        }
       }); 
   });
 });
