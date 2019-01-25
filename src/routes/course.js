@@ -21,7 +21,7 @@ router.get('/', (req, res, next) => {
 
 // GET /api/courses/:courseId
 // Returns all Course properties and related documents for the provided course ID
-router.get('/:courseId', (req, res, next) => {
+router.get('/:courseId', authenticateUser, (req, res, next) => {
   const { courseId } = req.params;
   Course
     .findById(courseId)
