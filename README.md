@@ -1,2 +1,3 @@
-# treehouse-project-11
-This repository houses the Building a Course Rating API With Express project
+# Course Rating API
+
+Treehouse Tech Degree Project 11 - Course Rating API
